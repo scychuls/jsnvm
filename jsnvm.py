@@ -32,7 +32,7 @@ friends = {
 
 # --- Tkinter Setup ---
 root = tk.Tk()
-root.title("Fun Friends Portal")
+root.title("jsnvm")
 root.geometry("600x400")
 root.config(bg="black")
 
