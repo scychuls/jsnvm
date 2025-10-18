@@ -1,110 +1,217 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>jsnvm</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.1/core.css">
   <script type="module" src="https://pyscript.net/releases/2024.5.1/core.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .background {
+      background: url('blue.gif') no-repeat center center/cover;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      filter: blur(5px) brightness(0.8);
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 30, 0.3);
+      z-index: -1;
+    }
+
+    .glass-container {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      width: 350px;
+      max-width: 90%;
+    }
+
+    h1 { margin-bottom: 10px; }
+
+    .friend-btn, .choice-btn {
+      background: #0033cc;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      margin: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .friend-btn:hover, .choice-btn:hover {
+      background: #0039e6;
+    }
+
+    .error {
+      color: #ff6666;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+  </style>
 </head>
 
 <body>
   <div class="background"></div>
   <div class="overlay"></div>
 
-  <div class="glass-container">
+  <div class="glass-container" id="app">
     <h1 id="greeting">Hellloooo 👋</h1>
     <p id="question">May I know who you are?</p>
 
     <div id="buttons">
-      <button class="friend-btn" id="soko">Soko</button>
-      <button class="friend-btn" id="paca">Paca</button>
-      <button class="friend-btn" id="euki">Euki</button>
-      <button class="friend-btn" id="mazen">Mazen</button>
+      <button class="friend-btn" id="Soko">Soko</button>
+      <button class="friend-btn" id="Paca">Paca</button>
+      <button class="friend-btn" id="Euki">Euki</button>
+      <button class="friend-btn" id="Mazen">Mazen</button>
     </div>
 
     <div id="output"></div>
   </div>
 
+  <canvas id="animation" class="hidden"></canvas>
+
   <py-script>
-from js import document
-import asyncio, random
+from js import document, window
+import random, asyncio
 
 friends = {
-    "soko": {"question": "If you are Soko, can you tell me your favorite color?", "answer": "red"},
-    "paca": {"question": "If you are Paca, what's your favorite flower?", "answer": "sunflower"},
-    "euki": {"question": "If you are Euki, what's your favorite color?", "answer": "black"},
-    "mazen": {"question": "If you are Mazen, what's your favorite fruit?", "answer": "coconut"}
+    "Soko": {
+        "question": "If you are Soko, can you tell me your favorite color?",
+        "choices": ["Blue", "Red", "Pink 💗", "Green"],
+        "answer": "Pink 💗",
+        "color": "hotpink",
+        "symbols": ["❤️", "🔥", "💗", "💖", "🔥"],
+        "message": "❤️🔥 HI SOKO 🔥❤️"
+    },
+    "Paca": {
+        "question": "If you are Paca, what flower do you love?",
+        "choices": ["Rose", "Tulip", "Sunflower 🌻", "Lily"],
+        "answer": "Sunflower 🌻",
+        "color": "purple",
+        "symbols": ["🌻", "💜", "🌼"],
+        "message": "💜🌻 Hi Riaaa Mama 🌻💜"
+    },
+    "Euki": {
+        "question": "If you are Euki, which describes you best?",
+        "choices": ["Calm 😌", "MEEEEEEEEEEEN 😎", "Sleepy 💤", "Shy 😳"],
+        "answer": "MEEEEEEEEEEEN 😎",
+        "color": "black",
+        "symbols": ["😈", "💀", "👾", "⚡", "🖤"],
+        "message": "😎 MEEEEEEEEEEEN 😎"
+    },
+    "Mazen": {
+        "question": "If you are Mazen, what’s your vibe?",
+        "choices": ["Coconut 🥥", "Noob NOOB NOOOOB 😜", "Chill", "Sweaty"],
+        "answer": "Noob NOOB NOOOOB 😜",
+        "color": "saddlebrown",
+        "symbols": ["🥥", "😜", "💥", "🍹"],
+        "message": "🥥 NOOOOOOBBBB 🥥"
+    }
 }
 
-# Reset everything to the intro screen
 def reset_ui():
-    document.getElementById("greeting").innerText = "Hellloooo 👋"
-    document.getElementById("question").innerText = "May I know who you are?"
-    document.getElementById("output").innerHTML = ""
-
-    btns = document.getElementById("buttons")
-    btns.innerHTML = ""
+    app = document.getElementById("app")
+    app.innerHTML = """
+    <h1 id='greeting'>Hellloooo 👋</h1>
+    <p id='question'>May I know who you are?</p>
+    <div id='buttons'>
+      <button class='friend-btn' id='Soko'>Soko</button>
+      <button class='friend-btn' id='Paca'>Paca</button>
+      <button class='friend-btn' id='Euki'>Euki</button>
+      <button class='friend-btn' id='Mazen'>Mazen</button>
+    </div>
+    <div id='output'></div>
+    """
 
     for name in friends.keys():
-        btn = document.createElement("button")
-        btn.className = "friend-btn"
-        btn.id = name
-        btn.innerText = name.capitalize()
+        btn = document.getElementById(name)
         btn.addEventListener("click", lambda e, n=name: ask_question(n))
-        btns.appendChild(btn)
 
-# When user chooses a name
 def ask_question(name):
-    q = friends[name]["question"]
-    document.getElementById("question").innerText = q
-    document.getElementById("buttons").innerHTML = ""
-    document.getElementById("output").innerHTML = ""
+    f = friends[name]
+    q = document.getElementById("question")
+    btns = document.getElementById("buttons")
+    out = document.getElementById("output")
 
-    correct = friends[name]["answer"]
-    wrong_choices = ["blue", "pink", "green", "yellow", "orange", "purple"]
-    options = [correct] + random.sample(wrong_choices, 3)
-    random.shuffle(options)
+    q.innerText = f["question"]
+    btns.innerHTML = ""
+    out.innerHTML = ""
 
-    for choice in options:
-        btn = document.createElement("button")
-        btn.className = "friend-btn"
-        btn.innerText = choice.capitalize()
-        btn.addEventListener("click", lambda e, n=name, c=choice: check_answer(n, c))
-        document.getElementById("buttons").appendChild(btn)
+    choices = f["choices"]
+    random.shuffle(choices)
 
-# When user answers
+    for choice in choices:
+        b = document.createElement("button")
+        b.className = "choice-btn"
+        b.innerText = choice
+        b.addEventListener("click", lambda e, n=name, c=choice: check_answer(n, c))
+        btns.appendChild(b)
+
 def check_answer(name, choice):
-    correct = friends[name]["answer"]
-    output = document.getElementById("output")
+    f = friends[name]
+    correct = f["answer"]
+    out = document.getElementById("output")
+    btns = document.getElementById("buttons")
 
-    if choice.lower() == correct.lower():
-        output.innerHTML = ""
-        show_animation(name)
+    if choice == correct:
+        show_animation(f)
     else:
-        document.getElementById("buttons").innerHTML = ""
-        output.innerHTML = f"<p class='error'>U R NOOOOOT {name.upper()} 😤</p>"
+        out.innerHTML = f"<p class='error'>U R NOT {name.upper()} 😤</p>"
+        btns.innerHTML = ""
         asyncio.ensure_future(retry())
 
-# Wait 2 seconds then reset
 async def retry():
     await asyncio.sleep(2)
     reset_ui()
 
-# When user passes
-def show_animation(name):
-    document.getElementById("buttons").innerHTML = ""
-    document.getElementById("question").innerText = ""
-    out = document.getElementById("output")
+def show_animation(f):
+    document.getElementById("app").innerHTML = ""
+    canvas = document.getElementById("animation")
+    canvas.classList.remove("hidden")
+    ctx = canvas.getContext("2d")
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    ctx.font = "40px Comic Sans MS"
+    ctx.fillStyle = f["color"]
+    ctx.fillText(f["message"], 50, 100)
 
-    if name == "soko":
-        out.innerHTML = "🔥❤️ HI SOKO ❤️🔥"
-    elif name == "paca":
-        out.innerHTML = "💜🌻 HI RIAAA MAMA 🌻💜"
-    elif name == "euki":
-        out.innerHTML = "🖤😎 MEEEEEEEEEEEN 😎🖤"
-    elif name == "mazen":
-        out.innerHTML = "🥥😂 NOOOOOOBBBB 😂🥥"
+    async def loop():
+        while True:
+            x = random.randint(0, canvas.width - 50)
+            y = random.randint(150, canvas.height - 50)
+            ctx.fillText(random.choice(f["symbols"]), x, y)
+            await asyncio.sleep(0.3)
+
+    asyncio.ensure_future(loop())
 
 reset_ui()
   </py-script>
