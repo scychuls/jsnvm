@@ -4,7 +4,7 @@ And maybe js i can do something fun XD
 
 # 💻 Try it guys bahahahah
 
-```bash
-git clone https://scychuls.github.io/jsnvm/jsnvm.py
+git clone https://github.com/scychuls/jsnvm.git
 cd jsnvm
 python jsnvm.py
+
