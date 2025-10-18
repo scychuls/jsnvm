@@ -15,6 +15,6 @@ and if you get it right, you get a **personal animation just for you!**
 Make sure you have Python 3 installed.
 
 ```bash
-git clone https://github.com/scychuls/jsnvm.git
+git clone https://scychuls.github.io/jsnvm/
 cd jsnvm
 python jsnvm.py
