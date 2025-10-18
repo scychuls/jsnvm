@@ -27,8 +27,8 @@
   </div>
 
   <py-script>
-from js import document, console
-import random, asyncio
+from js import document
+import asyncio, random
 
 friends = {
     "soko": {"question": "If you are Soko, can you tell me your favorite color?", "answer": "red"},
@@ -37,33 +37,43 @@ friends = {
     "mazen": {"question": "If you are Mazen, what's your favorite fruit?", "answer": "coconut"}
 }
 
+# Reset everything to the intro screen
 def reset_ui():
     document.getElementById("greeting").innerText = "Hellloooo 👋"
     document.getElementById("question").innerText = "May I know who you are?"
     document.getElementById("output").innerHTML = ""
-    document.getElementById("buttons").innerHTML = ""
+
+    btns = document.getElementById("buttons")
+    btns.innerHTML = ""
+
     for name in friends.keys():
         btn = document.createElement("button")
         btn.className = "friend-btn"
         btn.id = name
         btn.innerText = name.capitalize()
         btn.addEventListener("click", lambda e, n=name: ask_question(n))
-        document.getElementById("buttons").appendChild(btn)
+        btns.appendChild(btn)
 
+# When user chooses a name
 def ask_question(name):
     q = friends[name]["question"]
     document.getElementById("question").innerText = q
     document.getElementById("buttons").innerHTML = ""
+    document.getElementById("output").innerHTML = ""
 
-    choices = [friends[name]["answer"], "blue", "pink", "green"]
-    random.shuffle(choices)
-    for choice in choices:
+    correct = friends[name]["answer"]
+    wrong_choices = ["blue", "pink", "green", "yellow", "orange", "purple"]
+    options = [correct] + random.sample(wrong_choices, 3)
+    random.shuffle(options)
+
+    for choice in options:
         btn = document.createElement("button")
         btn.className = "friend-btn"
-        btn.innerText = choice
+        btn.innerText = choice.capitalize()
         btn.addEventListener("click", lambda e, n=name, c=choice: check_answer(n, c))
         document.getElementById("buttons").appendChild(btn)
 
+# When user answers
 def check_answer(name, choice):
     correct = friends[name]["answer"]
     output = document.getElementById("output")
@@ -72,13 +82,16 @@ def check_answer(name, choice):
         output.innerHTML = ""
         show_animation(name)
     else:
-        output.innerHTML = f"<p class='error'>U R NOT {name.upper()} 😤</p>"
+        document.getElementById("buttons").innerHTML = ""
+        output.innerHTML = f"<p class='error'>U R NOOOOOT {name.upper()} 😤</p>"
         asyncio.ensure_future(retry())
 
+# Wait 2 seconds then reset
 async def retry():
     await asyncio.sleep(2)
     reset_ui()
 
+# When user passes
 def show_animation(name):
     document.getElementById("buttons").innerHTML = ""
     document.getElementById("question").innerText = ""
