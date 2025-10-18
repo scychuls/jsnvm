@@ -1,18 +1,8 @@
-# 🎉 Fun Friends Portal
+# 🎉 JS NVM this lmao im just bored
 
-A funny interactive Python app made for my friends — Soko, Paca, Euki, and Mazen 💖
+And maybe js i can do something fun XD
 
-When you open the app, it greets you with:
-> “Hellloooo 👋 May I know who you are?”
-
-Then you can pick your name, answer your *super secret* question,
-and if you get it right, you get a **personal animation just for you!**
-
----
-
-## 💻 Run It Locally
-
-Make sure you have Python 3 installed.
+# 💻 Try it guys bahahahah
 
 ```bash
 git clone https://scychuls.github.io/jsnvm/
