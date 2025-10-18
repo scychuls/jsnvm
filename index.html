@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>jsnvm</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.1/core.css">
   <script type="module" src="https://pyscript.net/releases/2024.5.1/core.js"></script>
   <style>
     body {
       margin: 0;
+      padding: 0;
       height: 100vh;
       font-family: 'Poppins', sans-serif;
       color: white;
@@ -20,7 +22,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      filter: blur(5px) brightness(0.7);
+      filter: blur(5px) brightness(0.8);
       z-index: -2;
     }
 
@@ -39,34 +41,35 @@
       background: rgba(255,255,255,0.15);
       border-radius: 20px;
       padding: 40px;
-      backdrop-filter: blur(13px);
+      backdrop-filter: blur(10px);
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
       width: 350px;
       max-width: 90%;
     }
 
-    .friend-btn, .choice-btn {
-      background: #0033cc;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-size: 1em;
-      margin: 8px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
-      font-weight: bold;
-      box-shadow: 0 0 8px rgba(0, 51, 204, 0.3);
-    }
+    h1 { margin-bottom: 10px; }
 
-    .friend-btn:hover, .choice-btn:hover {
-      background: #0039e6;
-      transform: scale(1.05);
-      box-shadow: 0 0 12px rgba(0, 57, 230, 0.6);
+.friend-btn { 
+  background: #0033cc; 
+  border: none; 
+  border-radius: 10px; 
+  color: white; 
+  font-size: 1em; 
+  margin: 8px; 
+  padding: 10px 20px; 
+  cursor: pointer; 
+  transition: background 0.3s ease, transform 0.2s ease; 
+  font-weight: bold; box-shadow: 0 0 8px rgba(0, 51, 204, 0.3); 
+} 
+    
+    .friend-btn:hover { 
+      background: #0039e6; 
+      transform: scale(1.05); 
+      box-shadow: 0 0 12px rgba(0, 57, 230, 0.6); 
     }
 
     .error {
-      color: #ff0000;
+      color: #ff6666;
       font-weight: bold;
       margin-top: 20px;
     }
@@ -76,10 +79,6 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
     }
-
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 
@@ -87,7 +86,19 @@
   <div class="background"></div>
   <div class="overlay"></div>
 
-  <div class="glass-container" id="app"></div>
+  <div class="glass-container" id="app">
+    <h1 id="greeting">Hellloooo 👋</h1>
+    <p id="question">May I know who you are?</p>
+
+    <div id="buttons">
+      <button class="friend-btn" id="Soko">Soko</button>
+      <button class="friend-btn" id="Paca">Paca</button>
+      <button class="friend-btn" id="Euki">Euki</button>
+      <button class="friend-btn" id="Mazen">Mazen</button>
+    </div>
+
+    <div id="output"></div>
+  </div>
 
   <canvas id="animation" class="hidden"></canvas>
 
@@ -158,7 +169,7 @@ def ask_question(name):
     btns.innerHTML = ""
     out.innerHTML = ""
 
-    choices = list(f["choices"])
+    choices = f["choices"]
     random.shuffle(choices)
 
     for choice in choices:
