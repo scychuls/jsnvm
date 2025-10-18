@@ -16,18 +16,12 @@
     <h1 id="greeting">Hellloooo 👋</h1>
     <p id="question">May I know who you are?</p>
 
-    <div id="buttons">
-      <button class="friend-btn" id="soko">Soko</button>
-      <button class="friend-btn" id="paca">Paca</button>
-      <button class="friend-btn" id="euki">Euki</button>
-      <button class="friend-btn" id="mazen">Mazen</button>
-    </div>
-
+    <div id="buttons"></div>
     <div id="output"></div>
   </div>
 
   <py-script>
-from js import document, console
+from js import document
 import random, asyncio
 
 friends = {
@@ -41,7 +35,14 @@ def reset_ui():
     document.getElementById("greeting").innerText = "Hellloooo 👋"
     document.getElementById("question").innerText = "May I know who you are?"
     document.getElementById("output").innerHTML = ""
-    document.getElementById("buttons").style.display = "flex"
+    document.getElementById("buttons").innerHTML = ""
+    for name in friends.keys():
+        btn = document.createElement("button")
+        btn.className = "friend-btn"
+        btn.id = name
+        btn.innerText = name.capitalize()
+        btn.addEventListener("click", lambda e, n=name: ask_question(n))
+        document.getElementById("buttons").appendChild(btn)
 
 def ask_question(name):
     q = friends[name]["question"]
@@ -54,7 +55,7 @@ def ask_question(name):
         btn = document.createElement("button")
         btn.className = "friend-btn"
         btn.innerText = choice
-        btn.onclick = lambda e, n=name, c=choice: check_answer(n, c)
+        btn.addEventListener("click", lambda e, n=name, c=choice: check_answer(n, c))
         document.getElementById("buttons").appendChild(btn)
 
 def check_answer(name, choice):
@@ -77,18 +78,42 @@ def show_animation(name):
     document.getElementById("question").innerText = ""
     out = document.getElementById("output")
 
-    if name == "soko":
-        out.innerHTML = "🔥❤️ HI SOKO ❤️🔥"
-    elif name == "paca":
-        out.innerHTML = "💜🌻 HI RIAAA MAMA 🌻💜"
-    elif name == "euki":
-        out.innerHTML = "🖤😎 MEEEEEEEEEEEN 😎🖤"
-    elif name == "mazen":
-        out.innerHTML = "🥥😂 NOOOOOOBBBB 😂🥥"
+    out.innerHTML = ""
+    msg = document.createElement("h2")
 
-# bind buttons
-for friend in friends.keys():
-    document.getElementById(friend).onclick = lambda e, n=friend: ask_question(n)
+    if name == "soko":
+        msg.innerText = "🔥❤️ HI SOKO ❤️🔥"
+        spawn_emojis("🔥❤️")
+    elif name == "paca":
+        msg.innerText = "💜🌻 HI RIAAA MAMA 🌻💜"
+        spawn_emojis("🌻💜")
+    elif name == "euki":
+        msg.innerText = "🖤😎 MEEEEEEEEEEEN 😎🖤"
+        spawn_emojis("🖤😎")
+    elif name == "mazen":
+        msg.innerText = "🥥😂 NOOOOOOBBBB 😂🥥"
+        spawn_emojis("🥥😂")
+
+    out.appendChild(msg)
+
+def spawn_emojis(symbols):
+    for i in range(20):
+        emoji = document.createElement("div")
+        emoji.className = "emoji"
+        emoji.innerText = random.choice(list(symbols))
+        emoji.style.left = f"{random.randint(0, 100)}%"
+        emoji.style.animationDuration = f"{random.uniform(3, 6)}s"
+        emoji.style.fontSize = f"{random.randint(20, 40)}px"
+        document.body.appendChild(emoji)
+
+        # auto remove after animation
+        asyncio.ensure_future(remove_emoji(emoji))
+
+async def remove_emoji(el):
+    await asyncio.sleep(6)
+    el.remove()
+
+reset_ui()
   </py-script>
 </body>
 </html>
