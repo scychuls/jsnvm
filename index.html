@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>jsnvm</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.1/core.css">
   <script type="module" src="https://pyscript.net/releases/2024.5.1/core.js"></script>
   <style>
     body {
       margin: 0;
-      padding: 0;
       height: 100vh;
       font-family: 'Poppins', sans-serif;
       color: white;
@@ -22,7 +20,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      filter: blur(5px) brightness(0.8);
+      filter: blur(5px) brightness(0.7);
       z-index: -2;
     }
 
@@ -41,13 +39,11 @@
       background: rgba(255,255,255,0.15);
       border-radius: 20px;
       padding: 40px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(13px);
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
       width: 350px;
       max-width: 90%;
     }
-
-    h1 { margin-bottom: 10px; }
 
     .friend-btn, .choice-btn {
       background: #0033cc;
@@ -58,15 +54,19 @@
       margin: 8px;
       padding: 10px 20px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 51, 204, 0.3);
     }
 
     .friend-btn:hover, .choice-btn:hover {
       background: #0039e6;
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(0, 57, 230, 0.6);
     }
 
     .error {
-      color: #ff6666;
+      color: #ff0000;
       font-weight: bold;
       margin-top: 20px;
     }
@@ -76,6 +76,10 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -83,19 +87,7 @@
   <div class="background"></div>
   <div class="overlay"></div>
 
-  <div class="glass-container" id="app">
-    <h1 id="greeting">Hellloooo 👋</h1>
-    <p id="question">May I know who you are?</p>
-
-    <div id="buttons">
-      <button class="friend-btn" id="Soko">Soko</button>
-      <button class="friend-btn" id="Paca">Paca</button>
-      <button class="friend-btn" id="Euki">Euki</button>
-      <button class="friend-btn" id="Mazen">Mazen</button>
-    </div>
-
-    <div id="output"></div>
-  </div>
+  <div class="glass-container" id="app"></div>
 
   <canvas id="animation" class="hidden"></canvas>
 
@@ -166,7 +158,7 @@ def ask_question(name):
     btns.innerHTML = ""
     out.innerHTML = ""
 
-    choices = f["choices"]
+    choices = list(f["choices"])
     random.shuffle(choices)
 
     for choice in choices:
