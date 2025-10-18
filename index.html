@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jsnvm</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>👋 Hellloooo!</h1>
+    <p>May I know who you are?</p>
+    <div id="button-container">
+      <button class="friend-btn" onclick="choose('Soko')">Soko</button>
+      <button class="friend-btn" onclick="choose('Paca')">Paca</button>
+      <button class="friend-btn" onclick="choose('Euki')">Euki</button>
+      <button class="friend-btn" onclick="choose('Mazen')">Mazen</button>
+    </div>
+    <div id="question" class="hidden"></div>
+    <div id="choices" class="hidden"></div>
+    <div id="result" class="hidden"></div>
+    <canvas id="animation"></canvas>
+  </div>
+
+  <py-script src="main.py"></py-script>
+
+  <script>
+    function choose(name) {
+      const event = new CustomEvent("choose_name", { detail: name });
+      document.dispatchEvent(event);
+    }
+    function answer(choice) {
+      const event = new CustomEvent("answer_choice", { detail: choice });
+      document.dispatchEvent(event);
+    }
+  </script>
+</body>
+</html>
