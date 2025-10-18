@@ -1,40 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
   <title>jsnvm</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.5.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2024.5.1/core.js"></script>
 </head>
+
 <body>
-  <div id="app">
-    <h1>👋 Hellloooo!</h1>
-    <p>May I know who you are?</p>
-    <div id="button-container">
-      <button class="friend-btn" onclick="choose('Soko')">Soko</button>
-      <button class="friend-btn" onclick="choose('Paca')">Paca</button>
-      <button class="friend-btn" onclick="choose('Euki')">Euki</button>
-      <button class="friend-btn" onclick="choose('Mazen')">Mazen</button>
+  <div class="background"></div>
+  <div class="overlay"></div>
+
+  <div class="glass-container">
+    <h1 id="greeting">Hellloooo 👋</h1>
+    <p id="question">May I know who you are?</p>
+
+    <div id="buttons">
+      <button class="friend-btn" id="soko">Soko</button>
+      <button class="friend-btn" id="paca">Paca</button>
+      <button class="friend-btn" id="euki">Euki</button>
+      <button class="friend-btn" id="mazen">Mazen</button>
     </div>
-    <div id="question" class="hidden"></div>
-    <div id="choices" class="hidden"></div>
-    <div id="result" class="hidden"></div>
-    <canvas id="animation"></canvas>
+
+    <div id="output"></div>
   </div>
 
-  <py-script src="main.py"></py-script>
+  <py-script>
+from js import document, console
+import random, asyncio
 
-  <script>
-    function choose(name) {
-      const event = new CustomEvent("choose_name", { detail: name });
-      document.dispatchEvent(event);
-    }
-    function answer(choice) {
-      const event = new CustomEvent("answer_choice", { detail: choice });
-      document.dispatchEvent(event);
-    }
-  </script>
+friends = {
+    "soko": {"question": "If you are Soko, can you tell me your favorite color?", "answer": "red"},
+    "paca": {"question": "If you are Paca, what's your favorite flower?", "answer": "sunflower"},
+    "euki": {"question": "If you are Euki, what's your favorite color?", "answer": "black"},
+    "mazen": {"question": "If you are Mazen, what's your favorite fruit?", "answer": "coconut"}
+}
+
+def reset_ui():
+    document.getElementById("greeting").innerText = "Hellloooo 👋"
+    document.getElementById("question").innerText = "May I know who you are?"
+    document.getElementById("output").innerHTML = ""
+    document.getElementById("buttons").style.display = "flex"
+
+def ask_question(name):
+    q = friends[name]["question"]
+    document.getElementById("question").innerText = q
+    document.getElementById("buttons").innerHTML = ""
+
+    choices = [friends[name]["answer"], "blue", "pink", "green"]
+    random.shuffle(choices)
+    for choice in choices:
+        btn = document.createElement("button")
+        btn.className = "friend-btn"
+        btn.innerText = choice
+        btn.onclick = lambda e, n=name, c=choice: check_answer(n, c)
+        document.getElementById("buttons").appendChild(btn)
+
+def check_answer(name, choice):
+    correct = friends[name]["answer"]
+    output = document.getElementById("output")
+
+    if choice.lower() == correct.lower():
+        output.innerHTML = ""
+        show_animation(name)
+    else:
+        output.innerHTML = f"<p class='error'>U R NOT {name.upper()} 😤</p>"
+        asyncio.ensure_future(retry())
+
+async def retry():
+    await asyncio.sleep(2)
+    reset_ui()
+
+def show_animation(name):
+    document.getElementById("buttons").innerHTML = ""
+    document.getElementById("question").innerText = ""
+    out = document.getElementById("output")
+
+    if name == "soko":
+        out.innerHTML = "🔥❤️ HI SOKO ❤️🔥"
+    elif name == "paca":
+        out.innerHTML = "💜🌻 HI RIAAA MAMA 🌻💜"
+    elif name == "euki":
+        out.innerHTML = "🖤😎 MEEEEEEEEEEEN 😎🖤"
+    elif name == "mazen":
+        out.innerHTML = "🥥😂 NOOOOOOBBBB 😂🥥"
+
+# bind buttons
+for friend in friends.keys():
+    document.getElementById(friend).onclick = lambda e, n=friend: ask_question(n)
+  </py-script>
 </body>
 </html>
